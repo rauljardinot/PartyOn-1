@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <record id="product_estimate_service" model="product.template">
+        <field name="name">Custom Party Work</field>
+        <field name="sale_ok">True</field>
+        <field name="purchase_ok">False</field>
+        <field name="detailed_type">service</field>
+        <field name="list_price">0.0</field>
+        <field name="standard_price">0.0</field>
+    </record>
+</odoo>

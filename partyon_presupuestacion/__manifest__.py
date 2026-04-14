@@ -1,0 +1,26 @@
+{
+    "name": "PartyOn Presupuestacion",
+    "summary": "Presupuestacion interna para trabajos personalizados",
+    "version": "19.0.1.0.0",
+    "category": "Sales",
+    "author": "PartyOn",
+    "license": "GPL-3",
+    "depends": [
+        "mail",
+        "contacts",
+        "crm",
+        "sale_management",
+        "stock",
+        "purchase",
+        "account",
+    ],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/estimate_sequence.xml",
+        "data/estimate_product.xml",
+        "views/estimate_views.xml",
+        "views/sale_order_views.xml",
+    ],
+    "application": True,
+    "installable": True,
+}

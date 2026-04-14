@@ -1,0 +1,3 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_partyon_estimate_user,partyon.estimate user,model_partyon_estimate,base.group_user,1,1,1,1
+access_partyon_estimate_line_user,partyon.estimate.line user,model_partyon_estimate_line,base.group_user,1,1,1,1

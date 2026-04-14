@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partyon_estimate_tree" model="ir.ui.view">
+        <field name="name">partyon.estimate.tree</field>
+        <field name="model">partyon.estimate</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="name"/>
+                <field name="date"/>
+                <field name="partner_id"/>
+                <field name="opportunity_id"/>
+                <field name="user_id"/>
+                <field name="version"/>
+                <field name="subtotal_cost"/>
+                <field name="sale_price"/>
+                <field name="state"/>
+                <field name="company_id" groups="base.group_multi_company"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_partyon_estimate_search" model="ir.ui.view">
+        <field name="name">partyon.estimate.search</field>
+        <field name="model">partyon.estimate</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="opportunity_id"/>
+                <field name="user_id"/>
+                <filter name="draft" string="Draft" domain="[('state', '=', 'draft')]"/>
+                <filter name="review" string="In Review" domain="[('state', '=', 'review')]"/>
+                <filter name="approved" string="Approved" domain="[('state', '=', 'approved')]"/>
+                <filter name="quoted" string="Quoted" domain="[('state', '=', 'quoted')]"/>
+                <group expand="0" string="Group By">
+                    <filter name="group_partner" string="Customer" context="{'group_by': 'partner_id'}"/>
+                    <filter name="group_state" string="State" context="{'group_by': 'state'}"/>
+                    <filter name="group_user" string="Responsible" context="{'group_by': 'user_id'}"/>
+                    <filter name="group_company" string="Company" context="{'group_by': 'company_id'}"/>
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_partyon_estimate_form" model="ir.ui.view">
+        <field name="name">partyon.estimate.form</field>
+        <field name="model">partyon.estimate</field>
+        <field name="arch" type="xml">
+            <form string="Estimate">
+                <header>
+                    <button name="action_submit_review" type="object" string="Submit for Review" class="btn-primary" invisible="state != 'draft'"/>
+                    <button name="action_approve" type="object" string="Approve" class="btn-primary" invisible="state != 'review'"/>
+                    <button name="action_create_sale_order" type="object" string="Create Quotation" class="btn-primary" invisible="state not in ('approved', 'quoted', 'customer_approved')"/>
+                    <button name="action_mark_customer_approved" type="object" string="Mark Customer Approved" invisible="state != 'quoted'"/>
+                    <button name="action_create_new_version" type="object" string="New Version"/>
+                    <button name="action_cancel" type="object" string="Cancel" invisible="state == 'cancel'"/>
+                    <button name="action_reset_to_draft" type="object" string="Reset to Draft" invisible="state == 'draft'"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,review,approved,quoted,customer_approved,cancel"/>
+                </header>
+                <sheet>
+                    <div class="oe_button_box" name="button_box">
+                        <button name="action_view_sale_order" type="object" class="oe_stat_button" icon="fa-file-text-o" invisible="sale_order_count == 0">
+                            <field name="sale_order_count" widget="statinfo" string="Quotation"/>
+                        </button>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="name" readonly="1"/>
+                            <field name="partner_id"/>
+                            <field name="opportunity_id"/>
+                            <field name="user_id"/>
+                            <field name="date"/>
+                        </group>
+                        <group>
+                            <field name="company_id" groups="base.group_multi_company"/>
+                            <field name="version" readonly="1"/>
+                            <field name="parent_estimate_id" readonly="1"/>
+                            <field name="sale_order_id" readonly="1"/>
+                            <field name="currency_id" invisible="1"/>
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Lines">
+                            <field name="line_ids">
+                                <tree editable="bottom">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="name"/>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="width_cm"/>
+                                    <field name="height_cm"/>
+                                    <field name="area_m2" readonly="1"/>
+                                    <field name="material_cost" readonly="1"/>
+                                    <field name="subtotal_cost" readonly="1"/>
+                                    <field name="sale_price" readonly="1"/>
+                                </tree>
+                                <form string="Estimate Line">
+                                    <group>
+                                        <group>
+                                            <field name="name"/>
+                                            <field name="product_id"/>
+                                            <field name="quantity"/>
+                                            <field name="width_cm"/>
+                                            <field name="height_cm"/>
+                                            <field name="area_m2" readonly="1"/>
+                                            <field name="material_factor"/>
+                                        </group>
+                                        <group>
+                                            <field name="material_unit_cost" readonly="1"/>
+                                            <field name="material_cost" readonly="1"/>
+                                            <field name="waste_percent"/>
+                                            <field name="waste_cost" readonly="1"/>
+                                            <field name="operation_cost" readonly="1"/>
+                                            <field name="labor_cost" readonly="1"/>
+                                        </group>
+                                    </group>
+                                    <group string="Operations">
+                                        <group>
+                                            <field name="electricity_cost"/>
+                                            <field name="machine_cost"/>
+                                            <field name="paint_cost"/>
+                                            <field name="shipping_cost"/>
+                                            <field name="extra_cost"/>
+                                        </group>
+                                        <group>
+                                            <field name="labor_hours"/>
+                                            <field name="labor_rate"/>
+                                            <field name="design_hours"/>
+                                            <field name="design_rate"/>
+                                            <field name="handling_hours"/>
+                                            <field name="handling_rate"/>
+                                        </group>
+                                    </group>
+                                    <group string="Pricing">
+                                        <group>
+                                            <field name="use_estimate_margin"/>
+                                            <field name="margin_type" invisible="use_estimate_margin"/>
+                                            <field name="margin_value" invisible="use_estimate_margin or margin_type == 'manual'"/>
+                                            <field name="subtotal_cost" readonly="1"/>
+                                            <field name="suggested_sale_price" readonly="1"/>
+                                            <field name="manual_sale_price" invisible="use_estimate_margin or margin_type != 'manual'"/>
+                                            <field name="sale_price" readonly="1"/>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                        <page string="Pricing">
+                            <group>
+                                <group string="Costs">
+                                    <field name="total_material_cost" readonly="1"/>
+                                    <field name="total_operation_cost" readonly="1"/>
+                                    <field name="total_labor_cost" readonly="1"/>
+                                    <field name="total_overhead_cost" readonly="1"/>
+                                    <field name="total_shipping_cost" readonly="1"/>
+                                    <field name="total_extra_cost" readonly="1"/>
+                                    <field name="subtotal_cost" readonly="1"/>
+                                </group>
+                                <group string="Sale Price">
+                                    <field name="margin_type"/>
+                                    <field name="margin_value" invisible="margin_type == 'manual'"/>
+                                    <field name="manual_sale_price" invisible="margin_type != 'manual'"/>
+                                    <field name="suggested_sale_price" readonly="1"/>
+                                    <field name="sale_price" readonly="1"/>
+                                    <field name="approved_by" readonly="1"/>
+                                    <field name="approved_date" readonly="1"/>
+                                </group>
+                            </group>
+                        </page>
+                        <page string="Notes">
+                            <group>
+                                <field name="description"/>
+                                <field name="notes_internal"/>
+                                <field name="notes_customer"/>
+                            </group>
+                        </page>
+                        <page string="Versions">
+                            <field name="child_estimate_ids" readonly="1">
+                                <tree>
+                                    <field name="name"/>
+                                    <field name="version"/>
+                                    <field name="date"/>
+                                    <field name="state"/>
+                                    <field name="sale_price"/>
+                                </tree>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter/>
+            </form>
+        </field>
+    </record>
+
+    <record id="action_partyon_estimate" model="ir.actions.act_window">
+        <field name="name">Estimates</field>
+        <field name="res_model">partyon.estimate</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id" ref="view_partyon_estimate_search"/>
+    </record>
+
+    <menuitem id="menu_partyon_root" name="PartyOn"/>
+    <menuitem id="menu_partyon_estimate" name="Presupuestacion" parent="menu_partyon_root" action="action_partyon_estimate" sequence="10"/>
+</odoo>
